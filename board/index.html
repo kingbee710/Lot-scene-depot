@@ -121,6 +121,12 @@
     <div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div>
   </section>
 
+  <section class="card hidden" id="facespace">
+    <h2>Face Space profile</h2>
+    <div id="facespace-body"></div>
+    <button id="facespace-close">← Back to the board</button>
+  </section>
+
   <section class="card" id="join">
     <h2>Join &amp; Post</h2>
     <h3>1. Join the board — read the rules, agree, apply</h3>
@@ -226,6 +232,7 @@ async function loadPosts() {
       det.innerHTML = `<button class="close-detail">← Back to the board</button>
         <h3>${post.pinned ? '📌 ' : ''}${esc(post.title)}</h3>
         <p class="meta">${esc(post.category)} · by ${esc(post.display_name)} (@${esc(post.handle)}) · ${esc(post.created_at)} · post ID: ${esc(post.id)}</p>
+        <button class="view-profile" data-handle="${esc(post.handle)}">View @${esc(post.handle)}'s Face Space profile</button>
         <p>${renderBody(post.body)}</p>
         ${tearCats.includes(post.category) ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : ''}
         <div class="comments" data-post="${esc(post.id)}"><button class="load-comments">Show comments</button></div>
@@ -248,6 +255,13 @@ async function loadPosts() {
           });
         } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
       });
+      det.querySelector('.view-profile').addEventListener('click', () => {
+        const handle = post.handle, mine = d.posts.filter(x => String(x.handle).toLowerCase() === String(handle).toLowerCase());
+        const fs = $('#facespace'); fs.classList.remove('hidden');
+        $('#facespace-body').innerHTML = `<div class="detail"><h3>${esc(post.display_name)} (@${esc(handle)})</h3><p class="meta">Face Space profile · ${mine.length} post(s) on the board</p><p>This is the quick Face Space profile — name, handle, and their posts. Bio and profile picture come in the scaled-up version later.</p><div class="more-list">` + (mine.length ? mine.map(o => `<button data-fs="${esc(o.id)}">${esc(o.title)} · ${esc(o.category)}</button>`).join('') : '<p class="meta">No posts yet.</p>') + `</div></div>`;
+        fs.querySelectorAll('[data-fs]').forEach(b => b.addEventListener('click', () => { const o = d.posts.find(x => String(x.id) === b.dataset.fs); if (o) openPost(o, anchorEl); }));
+        fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      });
       det.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     box.querySelectorAll('.paper').forEach(el => el.addEventListener('click', () => {
@@ -258,6 +272,7 @@ async function loadPosts() {
     box.innerHTML = '<p class="empty">The board backend is not connected yet, so no posts can be shown. No fake posts are shown here.</p>';
   }
 }
+$('#facespace-close').addEventListener('click', () => $('#facespace').classList.add('hidden'));
 $('#filters').addEventListener('click', e => {
   const b = e.target.closest('.chip'); if (!b) return;
   document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('on'));

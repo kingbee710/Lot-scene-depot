@@ -151,6 +151,7 @@
       </label>
       <label>Title <input name="title" required maxlength="140"></label>
       <label>Post <textarea name="post_body" required maxlength="4000" rows="5"></textarea></label>
+      <p class="meta">Media: paste an image link right in your post text (a https link ending in .jpg, .png, .gif, or .webp) and it will show as a picture on the board. No upload button yet — that would need separate image storage.</p>
       <button class="primary" type="submit">Post it</button>
       <p class="meta">After the questionnaire and agreement, your post goes live right away. Break the rules after a warning and you'll be banned.</p>
       <p class="meta" id="post-msg"></p>
@@ -184,6 +185,10 @@
 <script>
 const $ = (s, el=document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+// Media: a post can include an image by pasting its https link in the post text.
+// Only https image links are turned into <img> tags — no uploads, no DB change,
+// so this works with the posts already live. Anything else stays plain text.
+const renderBody = s => esc(s).replace(/https:\/\/[^\s<>"']+\.(?:jpg|jpeg|png|gif|webp)(?:\?[^\s<>"']*)?/gi, u => `<br><img src="${u}" alt="Post image" style="max-width:100%;border-radius:8px;margin-top:.5rem">`);
 let currentCat = '';
 async function api(path, opts={}) {
   // If the owner has entered an admin token for The Gate, send it with
@@ -221,7 +226,7 @@ async function loadPosts() {
       det.innerHTML = `<button class="close-detail">← Back to the board</button>
         <h3>${post.pinned ? '📌 ' : ''}${esc(post.title)}</h3>
         <p class="meta">${esc(post.category)} · by ${esc(post.display_name)} (@${esc(post.handle)}) · ${esc(post.created_at)} · post ID: ${esc(post.id)}</p>
-        <p>${esc(post.body)}</p>
+        <p>${renderBody(post.body)}</p>
         ${tearCats.includes(post.category) ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : ''}
         <div class="comments" data-post="${esc(post.id)}"><button class="load-comments">Show comments</button></div>
         ${others.length ? `<div class="more-list"><strong>More in ${esc(post.category)} — scroll through them:</strong>` + others.map(o => `<button data-more="${esc(o.id)}">${esc(o.title)} · @${esc(o.handle)}</button>`).join('') + `</div>` : ''}`;

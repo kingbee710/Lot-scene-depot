@@ -1,0 +1,226 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lot Scene Depot — Community Board</title>
+<style>
+  :root{--gold:#f5c542;--purple:#a855f7;--blue:#38bdf8;--pink:#ec4899;--ink:#0b0714}
+  *{box-sizing:border-box}
+  body{margin:0;background:radial-gradient(1200px 600px at 20% 0%,#3b0764 0%,transparent 55%),radial-gradient(1000px 500px at 90% 20%,#0e7490 0%,transparent 50%),var(--ink);color:#f5f0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+  a{color:#fde68a}
+  header{padding:2.2rem 1rem 1rem;text-align:center}
+  .crystals{font-size:2.4rem;letter-spacing:.2rem}
+  .crystals b{color:var(--gold)}
+  h1{margin:.2rem 0;font-size:clamp(2rem,6vw,3.4rem);line-height:1.05}
+  h1 span{color:var(--gold)}
+  .tag{opacity:.9;max-width:44rem;margin:.6rem auto}
+  .wrap{max-width:52rem;margin:0 auto;padding:0 1rem 3rem}
+  .card{background:rgba(255,255,255,.07);border:1px solid rgba(245,197,66,.45);border-radius:18px;padding:1rem 1.1rem;margin:1rem 0;box-shadow:0 0 0 1px rgba(168,85,247,.15),0 10px 30px rgba(0,0,0,.35)}
+  .owner{display:flex;gap:.8rem;align-items:center}
+  .avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--blue));font-weight:800;font-size:1.2rem}
+  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
+  button,.chip{cursor:pointer;border:1px solid var(--gold);background:transparent;color:#fff;border-radius:999px;padding:.45rem .9rem;font-size:.95rem}
+  button.primary,.chip.on{background:var(--gold);color:#111;font-weight:700}
+  input,select,textarea{width:100%;padding:.65rem;border-radius:10px;border:1px solid #6b7280;background:#1e1533;color:#fff;margin:.3rem 0 .8rem;font:inherit}
+  label{font-weight:650}
+  .note{background:#fef3c7;color:#451a03;border-radius:12px;padding:.8rem 1rem}
+  .note b{color:#7c2d12}
+  .post{border-left:5px solid var(--purple);padding-left:.9rem;margin:1.2rem 0}
+  .post.pinned{border-color:var(--gold)}
+  .meta{opacity:.75;font-size:.9rem}
+  .empty{opacity:.85;text-align:center;padding:2rem 1rem}
+  .hidden{display:none}
+  .gate-item{border-top:1px dashed #a855f7;padding:.7rem 0}
+  small{opacity:.75}
+  footer{opacity:.7;text-align:center;padding:1rem;font-size:.9rem}
+</style>
+</head>
+<body>
+<header>
+  <div class="crystals" aria-hidden="true">🔮 <b>13</b> ✨ <b>47</b> 🔮</div>
+  <h1>Lot Scene Depot<br><span>Community Board</span></h1>
+  <p class="tag">A bulletin board for the lot family — events, ideas, stories, funny rants, and networking. Post it, talk it out, figure stuff out together.</p>
+  <p><a href="/">← Back to the Lot</a> &nbsp;·&nbsp; <a href="#join">Join &amp; Post</a> &nbsp;·&nbsp; <a href="#gate">The Gate (owner only)</a></p>
+</header>
+
+<main class="wrap">
+  <section class="card owner">
+    <div class="avatar">W</div>
+    <div><strong>WooKzZz</strong> <span class="meta">@wookzzz — board owner</span><br>
+    <small>WooKzZz approves members, and approves every post and comment before it goes public.</small></div>
+  </section>
+
+  <section class="card">
+    <h2>How this board works</h2>
+    <ol>
+      <li><strong>Apply to join.</strong> Fill in the Join form below. You are not a member until WooKzZz approves you.</li>
+      <li><strong>Approved members post and comment.</strong> Use the member token WooKzZz shares with you privately after approval.</li>
+      <li><strong>Nothing goes public on its own.</strong> Every post and comment waits at The Gate for owner approval first.</li>
+    </ol>
+    <h3>What belongs here</h3>
+    <p>Open — and it does <em>not</em> have to be lot-related: events, ideas, stories, something that happened to you, funny rants, networking, and comments on posts. Ideas like “I wish we could create something like this” and “what if we as people did this differently” belong here.</p>
+    <h3>What does not belong here</h3>
+    <p><strong>No vulgar or wacky stuff, nothing gross or offensive, no homophobic content, no political content, and no violence.</strong> Posts that break those rules are not approved.</p>
+    <div class="note" id="backend-note"><b>Board status:</b> checking the board backend…</div>
+  </section>
+
+  <section class="card">
+    <h2>Browse the board</h2>
+    <div class="chips" id="filters">
+      <button class="chip on" data-cat="">All</button>
+      <button class="chip" data-cat="Events">Events</button>
+      <button class="chip" data-cat="Ideas">Ideas</button>
+      <button class="chip" data-cat="Stories">Stories</button>
+      <button class="chip" data-cat="Funny/Rants">Funny / Rants</button>
+      <button class="chip" data-cat="Networking">Networking</button>
+    </div>
+    <div id="posts"><p class="empty">Loading the board…</p></div>
+  </section>
+
+  <section class="card" id="join">
+    <h2>Join &amp; Post</h2>
+    <h3>1. Apply to become a member</h3>
+    <form id="apply-form">
+      <label>Display name <input name="display_name" required maxlength="60"></label>
+      <label>Handle (letters, numbers, _ . -) <input name="handle" required maxlength="30"></label>
+      <label>Why do you want in? <textarea name="why" required maxlength="1000" rows="3"></textarea></label>
+      <label>Contact (private — only WooKzZz sees this) <input name="contact" maxlength="200" placeholder="Email or handle, optional"></label>
+      <button class="primary" type="submit">Apply to join</button>
+      <p class="meta" id="apply-msg"></p>
+    </form>
+    <h3>2. Post (approved members only)</h3>
+    <form id="post-form">
+      <label>Your handle <input name="handle" required maxlength="30"></label>
+      <label>Your member token (shared privately by WooKzZz after approval) <input name="member_token" required></label>
+      <label>Category
+        <select name="category" required>
+          <option>Events</option><option>Ideas</option><option>Stories</option>
+          <option>Funny/Rants</option><option>Networking</option>
+        </select>
+      </label>
+      <label>Title <input name="title" required maxlength="140"></label>
+      <label>Post <textarea name="post_body" required maxlength="4000" rows="5"></textarea></label>
+      <button class="primary" type="submit">Submit for approval</button>
+      <p class="meta">Your post stays hidden until WooKzZz approves it at The Gate.</p>
+      <p class="meta" id="post-msg"></p>
+    </form>
+  </section>
+
+  <section class="card" id="gate">
+    <h2>🔒 The Gate — owner only</h2>
+    <p class="meta">WooKzZz only. Enter the board admin token set in the Cloudflare dashboard (see DEPLOY.md). It is kept in this browser only, never in the site code.</p>
+    <label>Admin token <input id="admin-token" type="password" autocomplete="off"></label>
+    <button id="gate-load">Open The Gate</button>
+    <button id="gate-clear">Forget token on this browser</button>
+    <p class="meta" id="gate-msg"></p>
+    <div id="gate-queue" class="hidden">
+      <h3>Applications waiting</h3><div id="gate-members"></div>
+      <h3>Posts waiting</h3><div id="gate-posts"></div>
+      <h3>Comments waiting</h3><div id="gate-comments"></div>
+      <h3>Take down / pin a public post</h3>
+      <p class="meta">Use a public post's ID (shown under its title) with the buttons below, or approve/remove from the queue above.</p>
+      <label>Public post ID <input id="public-post-id"></label>
+      <button data-admin="pin_post">Pin it</button>
+      <button data-admin="unpin_post">Unpin it</button>
+      <button data-admin="takedown_post">Take it down</button>
+    </div>
+  </section>
+</main>
+
+<footer>Lot Scene Depot Community Board · Members are approved. Posts and comments are approved. Nothing gross, offensive, homophobic, political, or violent.</footer>
+
+<script>
+const $ = (s, el=document) => el.querySelector(s);
+const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+let currentCat = '';
+async function api(path, opts={}) {
+  // If the owner has entered an admin token for The Gate, send it with
+  // post/comment calls too, so WooKzZz can post without a member token.
+  const admin = localStorage.getItem('lsd_admin_token');
+  const r = await fetch(path, { headers: {'content-type':'application/json', ...(admin ? {'X-Admin-Token': admin} : {}), ...(opts.headers||{})}, ...opts });
+  const d = await r.json().catch(() => ({}));
+  if (!r.ok) throw new Error(d.error || ('Request failed (' + r.status + ')'));
+  return d;
+}
+async function loadPosts() {
+  const box = $('#posts');
+  try {
+    const d = await api('/api/posts' + (currentCat ? '?category=' + encodeURIComponent(currentCat) : ''));
+    $('#backend-note').innerHTML = '<b>Board status:</b> connected. Only owner-approved posts are shown here.';
+    if (!d.posts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Approved members: apply, get approved, then be the first post.</p>'; return; }
+    box.innerHTML = d.posts.map(p => `
+      <article class="post ${p.pinned ? 'pinned' : ''}">
+        <h3>${p.pinned ? '📌 ' : ''}${esc(p.title)}</h3>
+        <p class="meta">${esc(p.category)} · by ${esc(p.display_name)} (@${esc(p.handle)}) · ${esc(p.created_at)} · post ID: ${esc(p.id)}</p>
+        <p>${esc(p.body)}</p>
+        <div class="comments" data-post="${esc(p.id)}"><button class="load-comments">Show comments</button></div>
+      </article>`).join('');
+    box.querySelectorAll('.load-comments').forEach(btn => btn.addEventListener('click', async () => {
+      const wrap = btn.parentElement, pid = wrap.dataset.post;
+      try {
+        const d = await api('/api/comments?post_id=' + encodeURIComponent(pid));
+        wrap.innerHTML = (d.comments.length ? d.comments.map(c => `<p><strong>${esc(c.display_name)} (@${esc(c.handle)})</strong>: ${esc(c.body)}</p>`).join('') : '<p class="meta">No approved comments yet.</p>')
+          + `<form class="comment-form"><label>Handle <input name="handle" required></label><label>Member token <input name="member_token" required></label><label>Comment <textarea name="comment_body" required maxlength="2000" rows="3"></textarea></label><button type="submit">Submit comment for approval</button><p class="meta"></p></form>`;
+        wrap.querySelector('.comment-form').addEventListener('submit', async e => {
+          e.preventDefault();
+          const f = new FormData(e.target), msg = e.target.querySelector('.meta');
+          try { const r = await api('/api/comments', { method:'POST', body: JSON.stringify({ post_id: pid, handle: f.get('handle'), member_token: f.get('member_token'), comment_body: f.get('comment_body') }) }); msg.textContent = r.message; e.target.reset(); }
+          catch (err) { msg.textContent = err.message; }
+        });
+      } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
+    }));
+  } catch (err) {
+    $('#backend-note').innerHTML = '<b>Board status:</b> backend not connected yet. The board page is live, but posts cannot load until the D1 database and Pages Functions are deployed (see DEPLOY.md).';
+    box.innerHTML = '<p class="empty">The board backend is not connected yet, so no posts can be shown. No fake posts are shown here.</p>';
+  }
+}
+$('#filters').addEventListener('click', e => {
+  const b = e.target.closest('.chip'); if (!b) return;
+  document.querySelectorAll('#filters .chip').forEach(c => c.classList.remove('on'));
+  b.classList.add('on'); currentCat = b.dataset.cat; loadPosts();
+});
+$('#apply-form').addEventListener('submit', async e => {
+  e.preventDefault(); const f = new FormData(e.target), m = $('#apply-msg');
+  try { const r = await api('/api/applications', { method:'POST', body: JSON.stringify(Object.fromEntries(f)) }); m.textContent = r.message; e.target.reset(); }
+  catch (err) { m.textContent = err.message; }
+});
+$('#post-form').addEventListener('submit', async e => {
+  e.preventDefault(); const f = new FormData(e.target), m = $('#post-msg');
+  try { const r = await api('/api/posts', { method:'POST', body: JSON.stringify(Object.fromEntries(f)) }); m.textContent = r.message; e.target.reset(); }
+  catch (err) { m.textContent = err.message; }
+});
+function adminHeaders() { return { 'X-Admin-Token': localStorage.getItem('lsd_admin_token') || '' }; }
+async function adminAction(action, id) {
+  const r = await api('/api/admin', { method:'POST', headers: adminHeaders(), body: JSON.stringify({ action, id }) });
+  if (r.member_token) alert('New member token — share this privately with the member, never publicly:\n' + r.member_token);
+  await loadGate();
+}
+async function loadGate() {
+  const token = $('#admin-token').value.trim() || localStorage.getItem('lsd_admin_token') || '';
+  if (!token) { $('#gate-msg').textContent = 'Enter the admin token first.'; return; }
+  localStorage.setItem('lsd_admin_token', token);
+  try {
+    const d = await api('/api/pending', { headers: adminHeaders() });
+    $('#gate-msg').textContent = `Waiting: ${d.applications.length} member application(s), ${d.posts.length} post(s), ${d.comments.length} comment(s).`;
+    $('#gate-queue').classList.remove('hidden');
+    const item = (x, kind, extra='') => `<div class="gate-item"><strong>${esc(x.display_name || x.handle)}</strong> <span class="meta">@${esc(x.handle)} · ${esc(x.created_at)}</span><p>${esc(x.why || x.title || x.body || '')}</p>${x.contact ? `<p class="meta">Contact (owner only): ${esc(x.contact)}</p>` : ''}${extra}
+      <button data-a="approve_${kind}" data-id="${esc(x.id)}">Approve</button> <button data-a="reject_${kind}" data-id="${esc(x.id)}">Reject</button></div>`;
+    $('#gate-members').innerHTML = d.applications.length ? d.applications.map(x => item(x, 'member')).join('') : '<p class="meta">None waiting.</p>';
+    $('#gate-posts').innerHTML = d.posts.length ? d.posts.map(x => item(x, 'post', `<p>${esc(x.body)}</p>`)).join('') : '<p class="meta">None waiting.</p>';
+    $('#gate-comments').innerHTML = d.comments.length ? d.comments.map(x => item(x, 'comment')).join('') : '<p class="meta">None waiting.</p>';
+    document.querySelectorAll('#gate-queue [data-a]').forEach(b => b.addEventListener('click', async () => {
+      try { await adminAction(b.dataset.a, b.dataset.id); } catch (err) { $('#gate-msg').textContent = err.message; }
+    }));
+  } catch (err) { $('#gate-msg').textContent = err.message; }
+}
+$('#gate-load').addEventListener('click', loadGate);
+$('#gate-clear').addEventListener('click', () => { localStorage.removeItem('lsd_admin_token'); $('#admin-token').value=''; $('#gate-queue').classList.add('hidden'); $('#gate-msg').textContent='Admin token forgotten on this browser.'; });
+document.querySelectorAll('#gate [data-admin]').forEach(b => b.addEventListener('click', async () => {
+  const id = $('#public-post-id').value.trim(); if (!id) { $('#gate-msg').textContent = 'Enter a public post ID first.'; return; }
+  try { await adminAction(b.dataset.admin, id); $('#gate-msg').textContent = 'Done.'; } catch (err) { $('#gate-msg').textContent = err.message; }
+}));
+loadPosts();
+</script>
+</body>
+</html>

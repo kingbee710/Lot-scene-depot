@@ -40,8 +40,8 @@ export async function onRequestPost({ request, env }) {
   const id = crypto.randomUUID();
   await env.DB.prepare(
     `INSERT INTO comments (id, post_id, member_id, handle, display_name, body, status)
-     VALUES (?, ?, ?, ?, ?, ?, 'pending')`
+     VALUES (?, ?, ?, ?, ?, ?, 'approved')`
   ).bind(id, post_id, member.id, handle, member.display_name, String(comment_body).trim()).run();
-  return json({ ok: true, id, status: 'pending',
-    message: 'Comment submitted. It stays hidden until WooKzZz approves it at The Gate.' }, 201);
+  return json({ ok: true, id, status: 'approved',
+    message: 'Comment posted live. Break the rules after a warning and you will be banned.' }, 201);
 }

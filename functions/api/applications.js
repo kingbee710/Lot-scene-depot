@@ -1,6 +1,7 @@
-// POST /api/applications -> membership application; always starts as 'pending'.
-// No member is created as approved by this endpoint. Contact details are stored
-// for the owner only and are never returned by any public endpoint.
+// POST /api/applications -> questionnaire + agreement. No owner approval
+// after this: a completed questionnaire creates an approved member at once.
+// Contact details are stored for the owner only and are never returned
+// by any public endpoint. Bans still work via remove_member in admin.js.
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 
@@ -21,8 +22,8 @@ export async function onRequestPost({ request, env }) {
   const id = crypto.randomUUID();
   await env.DB.prepare(
     `INSERT INTO members (id, handle, display_name, why, contact, status, role)
-     VALUES (?, ?, ?, ?, ?, 'pending', 'member')`
+     VALUES (?, ?, ?, ?, ?, 'approved', 'member')`
   ).bind(id, handle, display_name, String(why).slice(0, 1000), contact ? String(contact).slice(0, 200) : null).run();
-  return json({ ok: true, id, status: 'pending',
-    message: 'Application received. WooKzZz must approve you as a member before you can post or comment.' }, 201);
+  return json({ ok: true, id, status: 'approved',
+    message: 'You are in. Post and comment with your handle — no approval wait.' }, 201);
 }

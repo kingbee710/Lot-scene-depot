@@ -7,7 +7,7 @@
 <style>
   :root{--gold:#f5c542;--purple:#a855f7;--blue:#38bdf8;--pink:#ec4899;--ink:#0b0714}
   *{box-sizing:border-box}
-  body{margin:0;background:radial-gradient(1200px 600px at 20% 0%,#3b0764 0%,transparent 55%),radial-gradient(1000px 500px at 90% 20%,#0e7490 0%,transparent 50%),var(--ink);color:#f5f0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+  body{margin:0;background:linear-gradient(rgba(7,4,24,.55),rgba(7,4,24,.65)),url('lot-night.jpg') center top / cover fixed no-repeat,#070418;color:#f5f0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
   a{color:#fde68a}
   header{padding:2.2rem 1rem 1rem;text-align:center}
   .crystals{font-size:2.4rem;letter-spacing:.2rem}
@@ -20,12 +20,49 @@
   .owner{display:flex;gap:.8rem;align-items:center}
   .avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--blue));font-weight:800;font-size:1.2rem}
   .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
-  button,.chip{cursor:pointer;border:1px solid var(--gold);background:transparent;color:#fff;border-radius:999px;padding:.45rem .9rem;font-size:.95rem}
+  button,.chip{cursor:pointer;border:1px solid var(--gold);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:.45rem .9rem;font-size:.95rem}
   button.primary,.chip.on{background:var(--gold);color:#111;font-weight:700}
   input,select,textarea{width:100%;padding:.65rem;border-radius:10px;border:1px solid #6b7280;background:#1e1533;color:#fff;margin:.3rem 0 .8rem;font:inherit}
   label{font-weight:650}
   .note{background:#fef3c7;color:#451a03;border-radius:12px;padding:.8rem 1rem}
   .note b{color:#7c2d12}
+  /* Corkboard look: store-kiosk bulletin board, papers pinned on cork */
+  .corkboard{background:linear-gradient(180deg,#7a5230,#6b4423 60%,#54341a);border:12px solid #3d2712;border-radius:12px;box-shadow:inset 0 0 40px rgba(0,0,0,.45),0 10px 30px rgba(0,0,0,.5);padding:1.4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.9rem}
+  .paper{position:relative;background:#fffbe6;color:#222;border-radius:2px;padding:1rem .95rem 1.1rem;box-shadow:0 6px 14px rgba(0,0,0,.45);cursor:pointer;transform:rotate(-1.2deg);transition:transform .15s}
+  .paper:nth-child(2n){background:#ffe9f2;transform:rotate(1.4deg)}
+  .paper:nth-child(3n){background:#e3f6ff;transform:rotate(-.6deg)}
+  .paper:nth-child(4n){background:#e8ffe6;transform:rotate(1.8deg)}
+  .paper:nth-child(5n){background:#fff3c4;transform:rotate(-1.8deg)}
+  .paper:hover{transform:rotate(0deg) scale(1.03);z-index:2}
+  .paper::before{content:'';position:absolute;top:-7px;left:50%;width:16px;height:16px;margin-left:-8px;border-radius:50%;background:#d62828;box-shadow:0 2px 3px rgba(0,0,0,.5)}
+  .paper h3{margin:.3rem 0 .4rem;color:#222;font-size:1.05rem;line-height:1.25}
+  .paper .cat{display:inline-block;background:#111;color:#fff;border-radius:999px;padding:.1rem .6rem;font-size:.8rem;font-weight:700}
+  .paper .snippet{color:#333;margin:.5rem 0}
+  .paper .meta{color:#555}
+  .paper.pinned{outline:3px solid var(--gold);grid-column:span 2}
+  .paper.pinned h3{font-size:1.15rem}
+  .paper{font-size:.92rem;padding:.8rem .8rem .9rem}
+  .paper.event{grid-column:span 2;background:linear-gradient(180deg,#fffbe6,#ffe9a8);border:3px solid var(--gold);transform:rotate(0deg)}
+  .paper.event h3{font-size:1.35rem;text-transform:uppercase;letter-spacing:.02em}
+  .paper .poster-tag{display:inline-block;background:var(--gold);color:#111;border-radius:4px;padding:.15rem .5rem;font-size:.8rem;font-weight:800}
+  .inline-detail{grid-column:1 / -1;background:#fffbe6;color:#222;border-radius:4px;padding:1.2rem;box-shadow:0 8px 20px rgba(0,0,0,.4);max-height:420px;overflow-y:auto}
+  .inline-detail h3{color:#222}
+  .inline-detail .meta{color:#555}
+  .more-list{margin-top:1rem;border-top:1px dashed #999;padding-top:.6rem}
+  .more-list button{display:block;width:100%;text-align:left;background:transparent;border:0;border-bottom:1px solid #ddd;color:#222;padding:.4rem 0;cursor:pointer}
+  .tear{display:flex;gap:3px;margin-top:.7rem;border-top:1px dashed #999;padding-top:.4rem}
+  .tear span{flex:1;text-align:center;font-size:.65rem;border:1px dashed #888;border-bottom:0;padding:.2rem .1rem .4rem;background:rgba(255,255,255,.4);cursor:pointer;word-break:break-all}
+  .tear span.torn{opacity:.35;text-decoration:line-through}
+  .sky{background:linear-gradient(180deg,#7ec8f7 0%,#c9a7f5 45%,#ff9e7d 75%,#ffd970 100%);border-radius:12px;padding:1rem 1rem 1.4rem;text-align:center;color:#1a1200;position:relative;overflow:hidden}
+  .sky .sun{position:absolute;top:12px;right:18px;width:52px;height:52px;border-radius:50%;background:#ffe45e;box-shadow:0 0 30px #ffe45e}
+  .sky .cloud{position:absolute;background:#fff;border-radius:999px;opacity:.9}
+  .gazebo-roof{width:100%;height:0;border-left:45vw solid transparent;border-right:45vw solid transparent;border-bottom:70px solid #8b3a2a}
+  .gazebo-beam{height:14px;background:#5c2a1e;border-radius:6px}
+  .gazebo-lights{text-align:center;letter-spacing:8px;color:#ffe45e;padding:.4rem 0}
+  .grass{background:#3e7d32;color:#fff;text-align:center;padding:1rem;border-radius:12px;margin-top:1rem}
+  .detail{background:#fffbe6;color:#222;border-radius:4px;padding:1.2rem;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .detail h3{color:#222}
+  .detail .meta{color:#555}
   .post{border-left:5px solid var(--purple);padding-left:.9rem;margin:1.2rem 0}
   .post.pinned{border-color:var(--gold)}
   .meta{opacity:.75;font-size:.9rem}
@@ -37,10 +74,11 @@
 </style>
 </head>
 <body>
+<div class="sky" style="background:transparent;color:#fff;text-shadow:0 2px 8px #000"><strong>Night in the lot</strong><br><small>String lights, vendor tents, stage in the distance — the community board, standing out in the lot, just like the lot at night</small><div style="letter-spacing:6px;margin-top:.5rem">● ● ● ● ● ● ●</div></div>
 <header>
   <div class="crystals" aria-hidden="true">🔮 <b>13</b> ✨ <b>47</b> 🔮</div>
   <h1>Lot Scene Depot<br><span>Community Board</span></h1>
-  <p class="tag">A bulletin board for the lot family — events, ideas, stories, funny rants, and networking. Post it, talk it out, figure stuff out together.</p>
+  <p class="tag">Out in the lot — the community board, posted outside for everyone to read. Events, ideas, stories, funny rants, and networking. Post it, talk it out, figure stuff out together.</p>
   <p><a href="/">← Back to the Lot</a> &nbsp;·&nbsp; <a href="#join">Join &amp; Post</a> &nbsp;·&nbsp; <a href="#gate">The Gate (owner only)</a></p>
 </header>
 
@@ -48,25 +86,27 @@
   <section class="card owner">
     <div class="avatar">W</div>
     <div><strong>WooKzZz</strong> <span class="meta">@wookzzz — board owner</span><br>
-    <small>WooKzZz approves members, and approves every post and comment before it goes public.</small></div>
+    <small>No Facebook, no approval wait. Do the questionnaire and agree to the rules, then post and comment freely — banned only if you break the rules after a warning.</small></div>
   </section>
 
   <section class="card">
     <h2>How this board works</h2>
     <ol>
-      <li><strong>Apply to join.</strong> Fill in the Join form below. You are not a member until WooKzZz approves you.</li>
-      <li><strong>Approved members post and comment.</strong> Just use your approved handle — no token to copy. Every post and comment still waits for owner approval first.</li>
-      <li><strong>Nothing goes public on its own.</strong> Every post and comment waits at The Gate for owner approval first.</li>
+      <li><strong>Fill in the questionnaire and agree to the rules.</strong> Name, handle, why you want in, contact (optional), tick that you agree to the rules — that's it, no Facebook, no proof.</li>
+      <li><strong>You're in — no approval wait after that.</strong> Once you've done the questionnaire and agreement, you post and comment with just your handle, right away.</li>
+      <li><strong>Break the rules and you're warned, then banned.</strong> If you post gross/vulgar stuff, bigotry, political stuff, or violence, you'll be asked to stop / warned. Do it again after a warning and you will be banned — posts taken down, no more posting.</li>
     </ol>
     <h3>What belongs here</h3>
-    <p>Open — and it does <em>not</em> have to be lot-related: events, ideas, stories, something that happened to you, funny rants, networking, and comments on posts. Ideas like “I wish we could create something like this” and “what if we as people did this differently” belong here.</p>
+    <p>Open — and it does <em>not</em> have to be lot-related: events, ideas, stories, something that happened to you, funny rants, networking, partnering up, and services. This is a real-life community board, meant to bring people together — food drives, somebody giving out stuff at Christmas to people who are homeless, community help, things like that. Advertisements are allowed as long as they're related to the counterculture.</p>
     <h3>What does not belong here</h3>
-    <p><strong>No vulgar or wacky stuff, nothing gross or offensive, no homophobic content, no political content, and no violence.</strong> Posts that break those rules are not approved.</p>
+    <p><strong>No vulgar or wacky stuff, nothing gross or offensive, no bigotry, no political content, and no violence.</strong> If you do one of those things, you'll be asked to stop / warned. If you do it again after you've been warned, you will be banned — your posts come down and you can't post again.</p>
     <div class="note" id="backend-note"><b>Board status:</b> checking the board backend…</div>
   </section>
 
+  <div class="gazebo-roof"></div><div class="gazebo-beam"></div><div class="gazebo-lights">● ● ● ● ● ● ●</div>
   <section class="card">
-    <h2>Browse the board</h2>
+    <h2>📌 Browse the board — inside the gazebo</h2>
+    <p class="meta">Tap a paper to open it right there on the board — the full post opens below it, with more posts in that same topic to scroll through. Event posts look like festival posters.</p>
     <div class="chips" id="filters">
       <button class="chip on" data-cat="">All</button>
       <button class="chip" data-cat="Events">Events</button>
@@ -74,19 +114,30 @@
       <button class="chip" data-cat="Stories">Stories</button>
       <button class="chip" data-cat="Funny/Rants">Funny / Rants</button>
       <button class="chip" data-cat="Networking">Networking</button>
+      <button class="chip" data-cat="Partner Up">Partner Up</button>
+      <button class="chip" data-cat="Services">Services</button>
+      <button class="chip" data-cat="Lot o Love">Lot o Love</button>
     </div>
-    <div id="posts"><p class="empty">Loading the board…</p></div>
+    <div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div>
   </section>
 
   <section class="card" id="join">
     <h2>Join &amp; Post</h2>
-    <h3>1. Apply to become a member</h3>
+    <h3>1. Join the board — read the rules, agree, apply</h3>
+    <div class="note"><b>Board rules — agree to these to join:</b>
+      <ul>
+        <li>No gross/offensive stuff, no vulgar stuff, no bigotry, no political stuff, no violence.</li>
+        <li>If you do one of those things, you'll be asked to stop / warned. Do it again after a warning and you will be banned.</li>
+        <li>Nothing goes public until WooKzZz approves it.</li>
+      </ul>
+    </div>
     <form id="apply-form">
       <label>Display name <input name="display_name" required maxlength="60"></label>
       <label>Handle (letters, numbers, _ . -) <input name="handle" required maxlength="30"></label>
       <label>Why do you want in? <textarea name="why" required maxlength="1000" rows="3"></textarea></label>
       <label>Contact (private — only WooKzZz sees this) <input name="contact" maxlength="200" placeholder="Email or handle, optional"></label>
-      <button class="primary" type="submit">Apply to join</button>
+      <label><input type="checkbox" name="agree_rules" required style="width:auto"> I agree to the board rules above</label>
+      <button class="primary" type="submit">Request to join</button>
       <p class="meta" id="apply-msg"></p>
     </form>
     <h3>2. Post (approved members only)</h3>
@@ -95,19 +146,19 @@
       <label>Category
         <select name="category" required>
           <option>Events</option><option>Ideas</option><option>Stories</option>
-          <option>Funny/Rants</option><option>Networking</option>
+          <option>Funny/Rants</option><option>Networking</option><option>Partner Up</option><option>Services</option><option>Lot o Love</option>
         </select>
       </label>
       <label>Title <input name="title" required maxlength="140"></label>
       <label>Post <textarea name="post_body" required maxlength="4000" rows="5"></textarea></label>
-      <button class="primary" type="submit">Submit for approval</button>
-      <p class="meta">Your post stays hidden until WooKzZz approves it at The Gate.</p>
+      <button class="primary" type="submit">Post it</button>
+      <p class="meta">After the questionnaire and agreement, your post goes live right away. Break the rules after a warning and you'll be banned.</p>
       <p class="meta" id="post-msg"></p>
     </form>
   </section>
 
   <section class="card" id="gate">
-    <h2>🔒 The Gate — owner only</h2>
+    <h2>🔒 The Gate — owner only</h2><p class="meta">No member or post approvals anymore. This is only for warnings, bans, and taking down posts that break the rules.</p>
     <p class="meta">WooKzZz only. Enter the board admin token set in the Cloudflare dashboard (see DEPLOY.md). It is kept in this browser only, never in the site code.</p>
     <label>Admin token <input id="admin-token" type="password" autocomplete="off"></label>
     <button id="gate-load">Open The Gate</button>
@@ -126,8 +177,9 @@
     </div>
   </section>
 </main>
+<div class="grass">Night lot · vendor tents · stage in the distance · board standing outside under the gazebo · all are welcome</div>
 
-<footer>Lot Scene Depot Community Board · Members are approved. Posts and comments are approved. Nothing gross, offensive, homophobic, political, or violent.</footer>
+<footer>Lot Scene Depot Community Board · Members are approved. Posts and comments are approved. Nothing gross, offensive, vulgar, bigotry, political, or violent. Warned first, banned if you do it again after a warning.</footer>
 
 <script>
 const $ = (s, el=document) => el.querySelector(s);
@@ -147,27 +199,54 @@ async function loadPosts() {
   try {
     const d = await api('/api/posts' + (currentCat ? '?category=' + encodeURIComponent(currentCat) : ''));
     $('#backend-note').innerHTML = '<b>Board status:</b> connected. Only owner-approved posts are shown here.';
-    if (!d.posts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Approved members: apply, get approved, then be the first post.</p>'; return; }
-    box.innerHTML = d.posts.map(p => `
-      <article class="post ${p.pinned ? 'pinned' : ''}">
-        <h3>${p.pinned ? '📌 ' : ''}${esc(p.title)}</h3>
-        <p class="meta">${esc(p.category)} · by ${esc(p.display_name)} (@${esc(p.handle)}) · ${esc(p.created_at)} · post ID: ${esc(p.id)}</p>
-        <p>${esc(p.body)}</p>
-        <div class="comments" data-post="${esc(p.id)}"><button class="load-comments">Show comments</button></div>
-      </article>`).join('');
-    box.querySelectorAll('.load-comments').forEach(btn => btn.addEventListener('click', async () => {
-      const wrap = btn.parentElement, pid = wrap.dataset.post;
-      try {
-        const d = await api('/api/comments?post_id=' + encodeURIComponent(pid));
-        wrap.innerHTML = (d.comments.length ? d.comments.map(c => `<p><strong>${esc(c.display_name)} (@${esc(c.handle)})</strong>: ${esc(c.body)}</p>`).join('') : '<p class="meta">No approved comments yet.</p>')
-          + `<form class="comment-form"><label>Handle <input name="handle" required></label><label>Comment <textarea name="comment_body" required maxlength="2000" rows="3"></textarea></label><button type="submit">Submit comment for approval</button><p class="meta"></p></form>`;
-        wrap.querySelector('.comment-form').addEventListener('submit', async e => {
-          e.preventDefault();
-          const f = new FormData(e.target), msg = e.target.querySelector('.meta');
-          try { const r = await api('/api/comments', { method:'POST', body: JSON.stringify({ post_id: pid, handle: f.get('handle'), comment_body: f.get('comment_body') }) }); msg.textContent = r.message; e.target.reset(); }
-          catch (err) { msg.textContent = err.message; }
-        });
-      } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
+    if (!d.posts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Do the questionnaire and agreement, then be the first post.</p>'; return; }
+    const tearCats = ['Partner Up', 'Services'];
+    const paperHtml = (post) => {
+      const isEvent = post.category === 'Events';
+      const tear = tearCats.includes(post.category)
+        ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : '';
+      return `<article class="paper ${isEvent ? 'event' : ''} ${post.pinned ? 'pinned' : ''}" data-id="${esc(post.id)}">
+        <span class="cat">${esc(post.category)}</span> ${isEvent ? '<span class="poster-tag">EVENT POSTER</span>' : ''}
+        <h3>${post.pinned ? '📌 ' : ''}${esc(post.title)}</h3>
+        <p class="snippet">${esc(String(post.body).slice(0, 130))}${String(post.body).length > 130 ? '…' : ''}</p>
+        <p class="meta">by ${esc(post.display_name)} (@${esc(post.handle)}) · tap to open</p>${tear}</article>`;
+    };
+    box.innerHTML = d.posts.map(paperHtml).join('');
+    box.querySelectorAll('.tear span').forEach(tab => tab.addEventListener('click', e => { e.stopPropagation(); tab.classList.toggle('torn'); }));
+    const openPost = (post, anchorEl) => {
+      document.querySelectorAll('.inline-detail').forEach(el => el.remove());
+      const others = d.posts.filter(x => x.category === post.category && String(x.id) !== String(post.id));
+      const det = document.createElement('div');
+      det.className = 'inline-detail';
+      det.innerHTML = `<button class="close-detail">← Back to the board</button>
+        <h3>${post.pinned ? '📌 ' : ''}${esc(post.title)}</h3>
+        <p class="meta">${esc(post.category)} · by ${esc(post.display_name)} (@${esc(post.handle)}) · ${esc(post.created_at)} · post ID: ${esc(post.id)}</p>
+        <p>${esc(post.body)}</p>
+        ${tearCats.includes(post.category) ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : ''}
+        <div class="comments" data-post="${esc(post.id)}"><button class="load-comments">Show comments</button></div>
+        ${others.length ? `<div class="more-list"><strong>More in ${esc(post.category)} — scroll through them:</strong>` + others.map(o => `<button data-more="${esc(o.id)}">${esc(o.title)} · @${esc(o.handle)}</button>`).join('') + `</div>` : ''}`;
+      anchorEl.after(det);
+      det.querySelector('.close-detail').addEventListener('click', () => det.remove());
+      det.querySelectorAll('.tear span').forEach(tab => tab.addEventListener('click', () => tab.classList.toggle('torn')));
+      det.querySelectorAll('[data-more]').forEach(b => b.addEventListener('click', () => { const o = d.posts.find(x => String(x.id) === b.dataset.more); if (o) openPost(o, anchorEl); }));
+      det.querySelector('.load-comments').addEventListener('click', async () => {
+        const wrap = det.querySelector('.comments'), pid = wrap.dataset.post;
+        try {
+          const cd = await api('/api/comments?post_id=' + encodeURIComponent(pid));
+          wrap.innerHTML = (cd.comments.length ? cd.comments.map(c => `<p><strong>${esc(c.display_name)} (@${esc(c.handle)})</strong>: ${esc(c.body)}</p>`).join('') : '<p class="meta">No approved comments yet.</p>')
+            + `<form class="comment-form"><label>Handle <input name="handle" required></label><label>Comment <textarea name="comment_body" required maxlength="2000" rows="3"></textarea></label><button type="submit">Submit comment for approval</button><p class="meta"></p></form>`;
+          wrap.querySelector('.comment-form').addEventListener('submit', async e => {
+            e.preventDefault();
+            const f = new FormData(e.target), msg = e.target.querySelector('.meta');
+            try { const r = await api('/api/comments', { method:'POST', body: JSON.stringify({ post_id: pid, handle: f.get('handle'), comment_body: f.get('comment_body') }) }); msg.textContent = r.message; e.target.reset(); }
+            catch (err) { msg.textContent = err.message; }
+          });
+        } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
+      });
+      det.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    };
+    box.querySelectorAll('.paper').forEach(el => el.addEventListener('click', () => {
+      const post = d.posts.find(x => String(x.id) === el.dataset.id); if (post) openPost(post, el);
     }));
   } catch (err) {
     $('#backend-note').innerHTML = '<b>Board status:</b> backend not connected yet. The board page is live, but posts cannot load until the D1 database and Pages Functions are deployed (see DEPLOY.md).';

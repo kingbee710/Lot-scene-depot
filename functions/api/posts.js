@@ -1,7 +1,7 @@
 // GET /api/posts  -> approved posts only (pinned first, then newest)
 //   ?category=Events|Ideas|Stories|Funny/Rants|Networking
 // POST /api/posts -> approved handle only (no member token); post starts as 'pending' (The Gate)
-const CATEGORIES = ['Events', 'Ideas', 'Stories', 'Funny/Rants', 'Networking'];
+const CATEGORIES = ['Events', 'Ideas', 'Stories', 'Funny/Rants', 'Networking', 'Partner Up', 'Services', 'Lot o Love'];
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 
@@ -47,8 +47,8 @@ export async function onRequestPost({ request, env }) {
   const id = crypto.randomUUID();
   await env.DB.prepare(
     `INSERT INTO posts (id, member_id, handle, display_name, category, title, body, status)
-     VALUES (?, ?, ?, ?, ?, ?, ?, 'pending')`
+     VALUES (?, ?, ?, ?, ?, ?, ?, 'approved')`
   ).bind(id, member.id, handle, member.display_name, category, String(title).trim(), String(post_body).trim()).run();
-  return json({ ok: true, id, status: 'pending',
-    message: 'Submitted. It stays hidden until WooKzZz approves it at The Gate.' }, 201);
+  return json({ ok: true, id, status: 'approved',
+    message: 'Posted live. Break the rules after a warning and you will be banned.' }, 201);
 }

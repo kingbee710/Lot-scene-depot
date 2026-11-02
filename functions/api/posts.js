@@ -1,6 +1,6 @@
 // GET /api/posts  -> approved posts only (pinned first, then newest)
 //   ?category=Events|Ideas|Stories|Funny/Rants|Networking
-// POST /api/posts -> approved member only; post starts as 'pending' (The Gate)
+// POST /api/posts -> approved handle only (no member token); post starts as 'pending' (The Gate)
 const CATEGORIES = ['Events', 'Ideas', 'Stories', 'Funny/Rants', 'Networking'];
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
@@ -21,20 +21,20 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON.' }, 400); }
-  const { handle, member_token, category, title, post_body } = body || {};
-  if (!handle || !member_token || !category || !title || !post_body) {
-    return json({ error: 'Handle, member token, category, title, and post text are required.' }, 400);
+  const { handle, category, title, post_body } = body || {};
+  if (!handle || !category || !title || !post_body) {
+    return json({ error: 'Handle, category, title, and post text are required.' }, 400);
   }
   if (!CATEGORIES.includes(category)) return json({ error: 'Unknown category.' }, 400);
   if (String(title).length > 140 || String(post_body).length > 4000) {
     return json({ error: 'Title is too long, or the post is over 4000 characters.' }, 400);
   }
-  // Membership gate: only an approved member with a matching token can post.
-  // Owner exception: WooKzZz posts with the admin token instead of a member
-  // token (the owner row intentionally has no member token).
+  // Simplified membership gate (Nov 2): an approved handle can post, no
+  // member token to copy/share. Posts still start 'pending' — nothing goes
+  // public until WooKzZz approves it at The Gate.
   let member = await env.DB.prepare(
-    `SELECT id, display_name FROM members WHERE lower(handle) = lower(?) AND token = ? AND status = 'approved'`
-  ).bind(handle, member_token).first();
+    `SELECT id, display_name FROM members WHERE lower(handle) = lower(?) AND status = 'approved'`
+  ).bind(handle).first();
   if (!member && String(handle).toLowerCase() === 'wookzzz'
       && env.ADMIN_TOKEN && request.headers.get('X-Admin-Token') === env.ADMIN_TOKEN) {
     member = await env.DB.prepare(
@@ -42,7 +42,7 @@ export async function onRequestPost({ request, env }) {
     ).first();
   }
   if (!member) {
-    return json({ error: 'Not an approved member, or the member token does not match. Apply to join first, and wait for owner approval.' }, 403);
+    return json({ error: 'Not an approved member yet. Apply to join first, and wait for owner approval.' }, 403);
   }
   const id = crypto.randomUUID();
   await env.DB.prepare(

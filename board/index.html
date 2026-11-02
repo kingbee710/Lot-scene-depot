@@ -55,7 +55,7 @@
     <h2>How this board works</h2>
     <ol>
       <li><strong>Apply to join.</strong> Fill in the Join form below. You are not a member until WooKzZz approves you.</li>
-      <li><strong>Approved members post and comment.</strong> Use the member token WooKzZz shares with you privately after approval.</li>
+      <li><strong>Approved members post and comment.</strong> Just use your approved handle — no token to copy. Every post and comment still waits for owner approval first.</li>
       <li><strong>Nothing goes public on its own.</strong> Every post and comment waits at The Gate for owner approval first.</li>
     </ol>
     <h3>What belongs here</h3>
@@ -92,7 +92,6 @@
     <h3>2. Post (approved members only)</h3>
     <form id="post-form">
       <label>Your handle <input name="handle" required maxlength="30"></label>
-      <label>Your member token (shared privately by WooKzZz after approval) <input name="member_token" required></label>
       <label>Category
         <select name="category" required>
           <option>Events</option><option>Ideas</option><option>Stories</option>
@@ -161,11 +160,11 @@ async function loadPosts() {
       try {
         const d = await api('/api/comments?post_id=' + encodeURIComponent(pid));
         wrap.innerHTML = (d.comments.length ? d.comments.map(c => `<p><strong>${esc(c.display_name)} (@${esc(c.handle)})</strong>: ${esc(c.body)}</p>`).join('') : '<p class="meta">No approved comments yet.</p>')
-          + `<form class="comment-form"><label>Handle <input name="handle" required></label><label>Member token <input name="member_token" required></label><label>Comment <textarea name="comment_body" required maxlength="2000" rows="3"></textarea></label><button type="submit">Submit comment for approval</button><p class="meta"></p></form>`;
+          + `<form class="comment-form"><label>Handle <input name="handle" required></label><label>Comment <textarea name="comment_body" required maxlength="2000" rows="3"></textarea></label><button type="submit">Submit comment for approval</button><p class="meta"></p></form>`;
         wrap.querySelector('.comment-form').addEventListener('submit', async e => {
           e.preventDefault();
           const f = new FormData(e.target), msg = e.target.querySelector('.meta');
-          try { const r = await api('/api/comments', { method:'POST', body: JSON.stringify({ post_id: pid, handle: f.get('handle'), member_token: f.get('member_token'), comment_body: f.get('comment_body') }) }); msg.textContent = r.message; e.target.reset(); }
+          try { const r = await api('/api/comments', { method:'POST', body: JSON.stringify({ post_id: pid, handle: f.get('handle'), comment_body: f.get('comment_body') }) }); msg.textContent = r.message; e.target.reset(); }
           catch (err) { msg.textContent = err.message; }
         });
       } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
@@ -193,7 +192,6 @@ $('#post-form').addEventListener('submit', async e => {
 function adminHeaders() { return { 'X-Admin-Token': localStorage.getItem('lsd_admin_token') || '' }; }
 async function adminAction(action, id) {
   const r = await api('/api/admin', { method:'POST', headers: adminHeaders(), body: JSON.stringify({ action, id }) });
-  if (r.member_token) alert('New member token — share this privately with the member, never publicly:\n' + r.member_token);
   await loadGate();
 }
 async function loadGate() {

@@ -19,16 +19,14 @@ export async function onRequestPost({ request, env }) {
 
   switch (action) {
     case 'approve_member': {
-      // Issue a private member posting token. The owner shares this token with
-      // the member privately (outside this system); the member pastes it into
-      // the post form. It is returned ONLY on this owner-only response.
-      const token = crypto.randomUUID();
+      // Simplified (Nov 2): one tap approves the handle. No member token to
+      // copy or share — the approved handle can post right away, and every
+      // post still waits at The Gate for post approval before going public.
       const r = await env.DB.prepare(
-        `UPDATE members SET status = 'approved', token = ? WHERE id = ? AND status = 'pending'`
-      ).bind(token, id).run();
+        `UPDATE members SET status = 'approved', token = NULL WHERE id = ? AND status = 'pending'`
+      ).bind(id).run();
       if (!r.meta.changes) return json({ error: 'No pending member with that id.' }, 404);
-      return json({ ok: true, member_token: token,
-        note: 'Share this token privately with the new member. It is not shown publicly.' });
+      return json({ ok: true, note: 'Member approved. They can now post with just their handle; each post still needs post approval.' });
     }
     case 'reject_member':
       await env.DB.prepare(`UPDATE members SET status = 'rejected' WHERE id = ?`).bind(id).run();

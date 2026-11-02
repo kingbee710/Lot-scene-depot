@@ -1,5 +1,5 @@
 // GET /api/comments?post_id=... -> approved comments only, oldest first
-// POST /api/comments -> approved member only; comment starts as 'pending' (The Gate)
+// POST /api/comments -> approved handle only (no member token); comment starts as 'pending' (The Gate)
 const json = (data, status = 200) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json' } });
 
@@ -16,9 +16,9 @@ export async function onRequestGet({ request, env }) {
 export async function onRequestPost({ request, env }) {
   let body;
   try { body = await request.json(); } catch { return json({ error: 'Invalid JSON.' }, 400); }
-  const { post_id, handle, member_token, comment_body } = body || {};
-  if (!post_id || !handle || !member_token || !comment_body) {
-    return json({ error: 'Post, handle, member token, and comment text are required.' }, 400);
+  const { post_id, handle, comment_body } = body || {};
+  if (!post_id || !handle || !comment_body) {
+    return json({ error: 'Post, handle, and comment text are required.' }, 400);
   }
   if (String(comment_body).length > 2000) return json({ error: 'Comment is over 2000 characters.' }, 400);
   const post = await env.DB.prepare(
@@ -26,8 +26,8 @@ export async function onRequestPost({ request, env }) {
   ).bind(post_id).first();
   if (!post) return json({ error: 'That post is not public.' }, 404);
   let member = await env.DB.prepare(
-    `SELECT id, display_name FROM members WHERE lower(handle) = lower(?) AND token = ? AND status = 'approved'`
-  ).bind(handle, member_token).first();
+    `SELECT id, display_name FROM members WHERE lower(handle) = lower(?) AND status = 'approved'`
+  ).bind(handle).first();
   if (!member && String(handle).toLowerCase() === 'wookzzz'
       && env.ADMIN_TOKEN && request.headers.get('X-Admin-Token') === env.ADMIN_TOKEN) {
     member = await env.DB.prepare(
@@ -35,7 +35,7 @@ export async function onRequestPost({ request, env }) {
     ).first();
   }
   if (!member) {
-    return json({ error: 'Not an approved member, or the member token does not match.' }, 403);
+    return json({ error: 'Not an approved member yet. Apply to join first, and wait for owner approval.' }, 403);
   }
   const id = crypto.randomUUID();
   await env.DB.prepare(

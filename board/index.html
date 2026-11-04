@@ -61,6 +61,12 @@
   .gazebo-lights{text-align:center;letter-spacing:8px;color:#ffe45e;padding:.4rem 0}
   .grass{background:#3e7d32;color:#fff;text-align:center;padding:1rem;border-radius:12px;margin-top:1rem}
   .detail{background:#fffbe6;color:#222;border-radius:4px;padding:1.2rem;box-shadow:0 8px 20px rgba(0,0,0,.4)}
+  .board-hero{width:100%;display:block;border:6px solid var(--gold);border-radius:12px;box-shadow:0 0 0 3px #3d2712,0 10px 30px rgba(0,0,0,.5);margin:.5rem 0 1rem}
+  .board-frame{border:8px solid var(--gold);border-radius:14px;padding:.4rem;background:#3d2712;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .headliner{border:4px solid var(--gold);border-radius:14px;padding:1rem;margin:0 0 1rem;background:rgba(255,255,255,.07)}
+  .headliner h3{margin:.2rem 0}
+  .headliner .paper{grid-column:span 2}
+  .paper.empty-paper{background:#f5f0ff;border:2px dashed #888;transform:rotate(0deg)}
   .detail h3{color:#222}
   .detail .meta{color:#555}
   .post{border-left:5px solid var(--purple);padding-left:.9rem;margin:1.2rem 0}
@@ -105,8 +111,9 @@
 
   <div class="gazebo-roof"></div><div class="gazebo-beam"></div><div class="gazebo-lights">● ● ● ● ● ● ●</div>
   <section class="card">
-    <h2>📌 Browse the board — inside the gazebo</h2>
-    <p class="meta">Tap a paper to open it right there on the board — the full post opens below it, with more posts in that same topic to scroll through. Event posts look like festival posters.</p>
+    <h2>📌 Community Message Board — last post in each topic</h2>
+    <img class="board-hero" src="cosmic-board.jpg" alt="Lot Scene Depot community board in the cosmic lot, with vendor booths">
+    <p class="meta">One paper per topic — the last post in each category, nothing else. No example flyers on this board: a topic with no posts yet just says so. Tap a paper to read the full post, then scroll through every other post in that same topic below it.</p>
     <div class="chips" id="filters">
       <button class="chip on" data-cat="">All</button>
       <button class="chip" data-cat="Events">Events</button>
@@ -118,7 +125,8 @@
       <button class="chip" data-cat="Services">Services</button>
       <button class="chip" data-cat="Lot o Love">Lot o Love</button>
     </div>
-    <div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div>
+    <div class="headliner" id="headliner"><h3>⭐ Headliner — WooKzZz</h3><div id="headliner-posts"><p class="meta">Loading headliner…</p></div></div>
+    <div class="board-frame"><div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div></div>
   </section>
 
   <section class="card hidden" id="facespace">
@@ -205,28 +213,43 @@ async function api(path, opts={}) {
   if (!r.ok) throw new Error(d.error || ('Request failed (' + r.status + ')'));
   return d;
 }
+let allPosts = [];
 async function loadPosts() {
   const box = $('#posts');
   try {
-    const d = await api('/api/posts' + (currentCat ? '?category=' + encodeURIComponent(currentCat) : ''));
+    const d = await api('/api/posts');
+    allPosts = d.posts || [];
     $('#backend-note').innerHTML = '<b>Board status:</b> connected. Only owner-approved posts are shown here.';
-    if (!d.posts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Do the questionnaire and agreement, then be the first post.</p>'; return; }
+    if (!allPosts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Do the questionnaire and agreement, then be the first post.</p>'; return; }
     const tearCats = ['Partner Up', 'Services'];
-    const paperHtml = (post) => {
+    const paperHtml = (post, isLatest=false) => {
       const isEvent = post.category === 'Events';
       const tear = tearCats.includes(post.category)
         ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : '';
       return `<article class="paper ${isEvent ? 'event' : ''} ${post.pinned ? 'pinned' : ''}" data-id="${esc(post.id)}">
-        <span class="cat">${esc(post.category)}</span> ${isEvent ? '<span class="poster-tag">EVENT POSTER</span>' : ''}
+        <span class="cat">${esc(post.category)}</span> ${isLatest ? '<span class="poster-tag">LATEST</span>' : ''} ${isEvent ? '<span class="poster-tag">EVENT POSTER</span>' : ''}
         <h3>${post.pinned ? '📌 ' : ''}${esc(post.title)}</h3>
         <p class="snippet">${esc(String(post.body).slice(0, 130))}${String(post.body).length > 130 ? '…' : ''}</p>
         <p class="meta">by ${esc(post.display_name)} (@${esc(post.handle)}) · tap to open</p>${tear}</article>`;
     };
-    box.innerHTML = d.posts.map(paperHtml).join('');
+    const CATS = ['Events','Ideas','Stories','Funny/Rants','Networking','Partner Up','Services','Lot o Love'];
+    { const head = $('#headliner-posts'); const pinned = allPosts.filter(x => x.pinned); const ownerLatest = allPosts.filter(x => String(x.handle).toLowerCase() === 'wookzzz').slice().sort((a,b) => String(b.created_at).localeCompare(String(a.created_at))); const headPosts = pinned.length ? pinned : ownerLatest.slice(0,1); head.innerHTML = headPosts.length ? headPosts.map(p => paperHtml(p)).join('') : '<p class="meta">No headliner pinned yet. Pin a post in The Gate and it will show here, big, at the top of the board.</p>'; head.querySelectorAll('.paper').forEach(el => el.addEventListener('click', () => { const post = allPosts.find(x => String(x.id) === el.dataset.id); if (post) openPost(post, el); })); }
+    if (currentCat) {
+      const filtered = allPosts.filter(x => x.category === currentCat);
+      box.innerHTML = filtered.length ? filtered.map(p => paperHtml(p)).join('') : '<p class="empty">No posts in ' + esc(currentCat) + ' yet.<br>Do the questionnaire and agreement, then be the first post.</p>';
+    } else {
+      box.innerHTML = CATS.map(cat => {
+        const inCat = allPosts.filter(x => x.category === cat);
+        if (!inCat.length) return `<article class="paper empty-paper" data-empty-cat="${esc(cat)}"><span class="cat">${esc(cat)}</span><h3>No posts yet</h3><p class="snippet">Nothing posted in ${esc(cat)} yet.</p><p class="meta">Tap to join &amp; be the first post</p></article>`;
+        const latest = inCat.slice().sort((a,b) => String(b.created_at).localeCompare(String(a.created_at)))[0];
+        return paperHtml(latest, true);
+      }).join('');
+    }
     box.querySelectorAll('.tear span').forEach(tab => tab.addEventListener('click', e => { e.stopPropagation(); tab.classList.toggle('torn'); }));
+    box.querySelectorAll('.empty-paper').forEach(el => el.addEventListener('click', () => { document.getElementById('join').scrollIntoView({ behavior: 'smooth', block: 'start' }); }));
     const openPost = (post, anchorEl) => {
       document.querySelectorAll('.inline-detail').forEach(el => el.remove());
-      const others = d.posts.filter(x => x.category === post.category && String(x.id) !== String(post.id));
+      const others = allPosts.filter(x => x.category === post.category && String(x.id) !== String(post.id));
       const det = document.createElement('div');
       det.className = 'inline-detail';
       det.innerHTML = `<button class="close-detail">← Back to the board</button>
@@ -236,11 +259,11 @@ async function loadPosts() {
         <p>${renderBody(post.body)}</p>
         ${tearCats.includes(post.category) ? `<div class="tear" title="Old-school tear-off tabs — tap one to tear it off"><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span><span>@${esc(post.handle)}</span></div>` : ''}
         <div class="comments" data-post="${esc(post.id)}"><button class="load-comments">Show comments</button></div>
-        ${others.length ? `<div class="more-list"><strong>More in ${esc(post.category)} — scroll through them:</strong>` + others.map(o => `<button data-more="${esc(o.id)}">${esc(o.title)} · @${esc(o.handle)}</button>`).join('') + `</div>` : ''}`;
+        ${others.length ? `<div class="more-list"><strong>All other posts in ${esc(post.category)}:</strong>` + others.map(o => `<button data-more="${esc(o.id)}">${esc(o.title)} · @${esc(o.handle)}</button>`).join('') + `</div>` : `<div class="more-list"><strong>All other posts in ${esc(post.category)}:</strong><p class="meta">No other posts in this topic yet — this is the only one.</p></div>`}`;
       anchorEl.after(det);
       det.querySelector('.close-detail').addEventListener('click', () => det.remove());
       det.querySelectorAll('.tear span').forEach(tab => tab.addEventListener('click', () => tab.classList.toggle('torn')));
-      det.querySelectorAll('[data-more]').forEach(b => b.addEventListener('click', () => { const o = d.posts.find(x => String(x.id) === b.dataset.more); if (o) openPost(o, anchorEl); }));
+      det.querySelectorAll('[data-more]').forEach(b => b.addEventListener('click', () => { const o = allPosts.find(x => String(x.id) === b.dataset.more); if (o) openPost(o, anchorEl); }));
       det.querySelector('.load-comments').addEventListener('click', async () => {
         const wrap = det.querySelector('.comments'), pid = wrap.dataset.post;
         try {
@@ -256,16 +279,16 @@ async function loadPosts() {
         } catch (err) { wrap.innerHTML = '<p>' + esc(err.message) + '</p>'; }
       });
       det.querySelector('.view-profile').addEventListener('click', () => {
-        const handle = post.handle, mine = d.posts.filter(x => String(x.handle).toLowerCase() === String(handle).toLowerCase());
+        const handle = post.handle, mine = allPosts.filter(x => String(x.handle).toLowerCase() === String(handle).toLowerCase());
         const fs = $('#facespace'); fs.classList.remove('hidden');
         $('#facespace-body').innerHTML = `<div class="detail"><h3>${esc(post.display_name)} (@${esc(handle)})</h3><p class="meta">Face Space profile · ${mine.length} post(s) on the board</p><p>This is the quick Face Space profile — name, handle, and their posts. Bio and profile picture come in the scaled-up version later.</p><div class="more-list">` + (mine.length ? mine.map(o => `<button data-fs="${esc(o.id)}">${esc(o.title)} · ${esc(o.category)}</button>`).join('') : '<p class="meta">No posts yet.</p>') + `</div></div>`;
-        fs.querySelectorAll('[data-fs]').forEach(b => b.addEventListener('click', () => { const o = d.posts.find(x => String(x.id) === b.dataset.fs); if (o) openPost(o, anchorEl); }));
+        fs.querySelectorAll('[data-fs]').forEach(b => b.addEventListener('click', () => { const o = allPosts.find(x => String(x.id) === b.dataset.fs); if (o) openPost(o, anchorEl); }));
         fs.scrollIntoView({ behavior: 'smooth', block: 'start' });
       });
       det.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
     box.querySelectorAll('.paper').forEach(el => el.addEventListener('click', () => {
-      const post = d.posts.find(x => String(x.id) === el.dataset.id); if (post) openPost(post, el);
+      const post = allPosts.find(x => String(x.id) === el.dataset.id); if (post) openPost(post, el);
     }));
   } catch (err) {
     $('#backend-note').innerHTML = '<b>Board status:</b> backend not connected yet. The board page is live, but posts cannot load until the D1 database and Pages Functions are deployed (see DEPLOY.md).';

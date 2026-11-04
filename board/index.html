@@ -106,8 +106,8 @@
   </section>
 
   <section class="card" id="join">
-    <h2>Join &amp; Post</h2>
-    <h3>1. Join the board — read the rules, agree, apply</h3>
+    <h2>Join</h2>
+    <h3>Join the board — read the rules, agree, apply</h3>
     <p class="meta">Board rules, short version: No gross/offensive, vulgar, bigotry, political, or violence. Warned first, banned if you do it again after a warning.</p>
     <form id="apply-form">
       <label>Display name <input name="display_name" required maxlength="60"></label>
@@ -118,7 +118,12 @@
       <button class="primary" type="submit">Request to join</button>
       <p class="meta" id="apply-msg"></p>
     </form>
-    <h3>2. Post (approved members only)</h3>
+    </form>
+  </section>
+
+  <section class="card" id="post">
+    <h2>Post</h2>
+    <h3>Post (approved members only)</h3>
     <form id="post-form">
       <label>Your handle <input name="handle" required maxlength="30"></label>
       <label>Category
@@ -156,10 +161,6 @@
     </div>
   </section>
 </main>
-<div class="grass">Night lot · vendor tents · stage in the distance · board standing outside under the gazebo · all are welcome</div>
-
-<footer>Lot Scene Depot Community Board · No approval wait after the questionnaire and agreement. Nothing gross, offensive, vulgar, bigotry, political, or violent. Warned first, banned if you do it again after a warning.</footer>
-
 <script>
 const $ = (s, el=document) => el.querySelector(s);
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));

@@ -183,7 +183,7 @@ async function loadPosts() {
   try {
     const d = await api('/api/posts');
     allPosts = d.posts || [];
-    $('#backend-note').innerHTML = '<b>Board status:</b> connected. Only owner-approved posts are shown here.';
+    const bn = $('#backend-note'); if (bn) bn.innerHTML = '<b>Board status:</b> connected.';
     if (!allPosts.length) { box.innerHTML = '<p class="empty">The board is empty right now — no approved posts yet.<br>Do the questionnaire and agreement, then be the first post.</p>'; return; }
     const tearCats = ['Partner Up', 'Services'];
     const paperHtml = (post, isLatest=false) => {

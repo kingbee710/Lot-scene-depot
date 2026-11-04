@@ -7,7 +7,7 @@
 <style>
   :root{--gold:#f5c542;--purple:#a855f7;--blue:#38bdf8;--pink:#ec4899;--ink:#0b0714}
   *{box-sizing:border-box}
-  body{margin:0;background:linear-gradient(rgba(7,4,24,.55),rgba(7,4,24,.65)),url('lot-night.jpg') center top / cover fixed no-repeat,#070418;color:#f5f0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
+  body{margin:0;background:#140c28;color:#f5f0ff;font-family:system-ui,-apple-system,Segoe UI,Roboto,sans-serif;line-height:1.5}
   a{color:#fde68a}
   header{padding:2.2rem 1rem 1rem;text-align:center}
   .crystals{font-size:2.4rem;letter-spacing:.2rem}
@@ -19,7 +19,7 @@
   .card{background:rgba(255,255,255,.07);border:1px solid rgba(245,197,66,.45);border-radius:18px;padding:1rem 1.1rem;margin:1rem 0;box-shadow:0 0 0 1px rgba(168,85,247,.15),0 10px 30px rgba(0,0,0,.35)}
   .owner{display:flex;gap:.8rem;align-items:center}
   .avatar{width:52px;height:52px;border-radius:50%;display:grid;place-items:center;background:linear-gradient(135deg,var(--purple),var(--blue));font-weight:800;font-size:1.2rem}
-  .chips{display:flex;flex-wrap:wrap;gap:.5rem;margin:.6rem 0}
+  .chips{display:none}
   button,.chip{cursor:pointer;border:1px solid var(--gold);background:rgba(255,255,255,.06);color:#fff;border-radius:999px;padding:.45rem .9rem;font-size:.95rem}
   button.primary,.chip.on{background:var(--gold);color:#111;font-weight:700}
   input,select,textarea{width:100%;padding:.65rem;border-radius:10px;border:1px solid #6b7280;background:#1e1533;color:#fff;margin:.3rem 0 .8rem;font:inherit}
@@ -27,7 +27,7 @@
   .note{background:#fef3c7;color:#451a03;border-radius:12px;padding:.8rem 1rem}
   .note b{color:#7c2d12}
   /* Corkboard look: store-kiosk bulletin board, papers pinned on cork */
-  .corkboard{background:linear-gradient(180deg,#7a5230,#6b4423 60%,#54341a);border:12px solid #3d2712;border-radius:12px;box-shadow:inset 0 0 40px rgba(0,0,0,.45),0 10px 30px rgba(0,0,0,.5);padding:1.4rem;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.9rem}
+  .corkboard{background:transparent;border:0;border-radius:0;box-shadow:none;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:.9rem}
   .paper{position:relative;background:#fffbe6;color:#222;border-radius:2px;padding:1rem .95rem 1.1rem;box-shadow:0 6px 14px rgba(0,0,0,.45);cursor:pointer;transform:rotate(-1.2deg);transition:transform .15s}
   .paper:nth-child(2n){background:#ffe9f2;transform:rotate(1.4deg)}
   .paper:nth-child(3n){background:#e3f6ff;transform:rotate(-.6deg)}
@@ -62,7 +62,7 @@
   .grass{background:#3e7d32;color:#fff;text-align:center;padding:1rem;border-radius:12px;margin-top:1rem}
   .detail{background:#fffbe6;color:#222;border-radius:4px;padding:1.2rem;box-shadow:0 8px 20px rgba(0,0,0,.4)}
   .board-hero{width:100%;display:block;border:6px solid var(--gold);border-radius:12px;box-shadow:0 0 0 3px #3d2712,0 10px 30px rgba(0,0,0,.5);margin:.5rem 0 1rem}
-  .board-frame{border:8px solid var(--gold);border-radius:14px;padding:.4rem;background:#3d2712;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+  .board-frame{border:0;border-radius:0;padding:0;background:transparent;box-shadow:none}
   .headliner{border:4px solid var(--gold);border-radius:14px;padding:1rem;margin:0 0 1rem;background:rgba(255,255,255,.07)}
   .headliner h3{margin:.2rem 0}
   .headliner .paper{grid-column:span 2}
@@ -80,26 +80,9 @@
 </style>
 </head>
 <body>
-<div class="sky" style="background:transparent;color:#fff;text-shadow:0 2px 8px #000"><strong>Night in the lot</strong><br><small>String lights, vendor tents, stage in the distance — the community board, standing out in the lot, just like the lot at night</small><div style="letter-spacing:6px;margin-top:.5rem">● ● ● ● ● ● ●</div></div>
-<header>
-  <div class="crystals" aria-hidden="true">🔮 <b>13</b> ✨ <b>47</b> 🔮</div>
-  <h1>Lot Scene Depot<br><span>Community Board</span></h1>
-  <p class="tag">Out in the lot — the community board, posted outside for everyone to read. Events, ideas, stories, funny rants, and networking. Post it, talk it out, figure stuff out together.</p>
-  <p><a href="/">← Back to the Lot</a> &nbsp;·&nbsp; <a href="#join">Join &amp; Post</a> &nbsp;·&nbsp; <a href="#gate">The Gate (owner only)</a></p>
-</header>
-
 <main class="wrap">
-  <section class="card owner">
-    <div class="avatar">W</div>
-    <div><strong>WooKzZz</strong> <span class="meta">@wookzzz — board owner</span><br>
-    <small>No Facebook, no approval wait. Do the questionnaire and agree to the rules, then post and comment freely — banned only if you break the rules after a warning.</small></div>
-  </section>
-
-  <div class="gazebo-roof"></div><div class="gazebo-beam"></div><div class="gazebo-lights">● ● ● ● ● ● ●</div>
-  <section class="card">
-    <h2>📌 Community Message Board — last post in each topic</h2>
+  <section>
     <img class="board-hero" src="cosmic-board.jpg" alt="Lot Scene Depot community board in the cosmic lot, with vendor booths">
-    <p class="meta">One paper per topic — the last post in each category, nothing else. No example flyers on this board: a topic with no posts yet just says so. Tap a paper to read the full post, then scroll through every other post in that same topic below it.</p>
     <div class="chips" id="filters">
       <button class="chip on" data-cat="">All</button>
       <button class="chip" data-cat="Events">Events</button>
@@ -112,6 +95,7 @@
       <button class="chip" data-cat="Lot o Love">Lot o Love</button>
     </div>
     <div class="headliner" id="headliner"><h3>⭐ Founder Post — WooKzZz</h3><div id="headliner-posts"><p class="meta">Loading headliner…</p></div></div>
+    <h2>📌 Community Message Board — last post in each topic</h2>
     <div class="board-frame"><div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div></div>
   </section>
 

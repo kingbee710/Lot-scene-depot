@@ -255,7 +255,7 @@ async function loadPosts() {
       const post = allPosts.find(x => String(x.id) === el.dataset.id); if (post) openPost(post, el);
     }));
   } catch (err) {
-    $('#backend-note').innerHTML = '<b>Board status:</b> backend not connected yet. The board page is live, but posts cannot load until the D1 database and Pages Functions are deployed (see DEPLOY.md).';
+    const bn2 = $('#backend-note'); if (bn2) bn2.innerHTML = '<b>Board status:</b> backend not connected yet.';
     box.innerHTML = '<p class="empty">The board backend is not connected yet, so no posts can be shown. No fake posts are shown here.</p>';
   }
 }

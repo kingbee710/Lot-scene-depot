@@ -95,20 +95,6 @@
     <small>No Facebook, no approval wait. Do the questionnaire and agree to the rules, then post and comment freely — banned only if you break the rules after a warning.</small></div>
   </section>
 
-  <section class="card">
-    <h2>How this board works</h2>
-    <ol>
-      <li><strong>Fill in the questionnaire and agree to the rules.</strong> Name, handle, why you want in, contact (optional), tick that you agree to the rules — that's it, no Facebook, no proof.</li>
-      <li><strong>You're in — no approval wait after that.</strong> Once you've done the questionnaire and agreement, you post and comment with just your handle, right away.</li>
-      <li><strong>Break the rules and you're warned, then banned.</strong> If you post gross/vulgar stuff, bigotry, political stuff, or violence, you'll be asked to stop / warned. Do it again after a warning and you will be banned — posts taken down, no more posting.</li>
-    </ol>
-    <h3>What belongs here</h3>
-    <p>Open — and it does <em>not</em> have to be lot-related: events, ideas, stories, something that happened to you, funny rants, networking, partnering up, and services. This is a real-life community board, meant to bring people together — food drives, somebody giving out stuff at Christmas to people who are homeless, community help, things like that. Advertisements are allowed as long as they're related to the counterculture.</p>
-    <h3>What does not belong here</h3>
-    <p><strong>No vulgar or wacky stuff, nothing gross or offensive, no bigotry, no political content, and no violence.</strong> If you do one of those things, you'll be asked to stop / warned. If you do it again after you've been warned, you will be banned — your posts come down and you can't post again.</p>
-    <div class="note" id="backend-note"><b>Board status:</b> checking the board backend…</div>
-  </section>
-
   <div class="gazebo-roof"></div><div class="gazebo-beam"></div><div class="gazebo-lights">● ● ● ● ● ● ●</div>
   <section class="card">
     <h2>📌 Community Message Board — last post in each topic</h2>
@@ -125,7 +111,7 @@
       <button class="chip" data-cat="Services">Services</button>
       <button class="chip" data-cat="Lot o Love">Lot o Love</button>
     </div>
-    <div class="headliner" id="headliner"><h3>⭐ Headliner — WooKzZz</h3><div id="headliner-posts"><p class="meta">Loading headliner…</p></div></div>
+    <div class="headliner" id="headliner"><h3>⭐ Founder Post — WooKzZz</h3><div id="headliner-posts"><p class="meta">Loading headliner…</p></div></div>
     <div class="board-frame"><div id="posts" class="corkboard"><p class="empty">Loading the board…</p></div></div>
   </section>
 
@@ -138,19 +124,13 @@
   <section class="card" id="join">
     <h2>Join &amp; Post</h2>
     <h3>1. Join the board — read the rules, agree, apply</h3>
-    <div class="note"><b>Board rules — agree to these to join:</b>
-      <ul>
-        <li>No gross/offensive stuff, no vulgar stuff, no bigotry, no political stuff, no violence.</li>
-        <li>If you do one of those things, you'll be asked to stop / warned. Do it again after a warning and you will be banned.</li>
-        <li>Once you've done the questionnaire and agreement, your posts go up right away — no approval wait.</li>
-      </ul>
-    </div>
+    <p class="meta">Board rules, short version: No gross/offensive, vulgar, bigotry, political, or violence. Warned first, banned if you do it again after a warning.</p>
     <form id="apply-form">
       <label>Display name <input name="display_name" required maxlength="60"></label>
       <label>Handle (letters, numbers, _ . -) <input name="handle" required maxlength="30"></label>
       <label>Why do you want in? <textarea name="why" required maxlength="1000" rows="3"></textarea></label>
       <label>Contact (private — only WooKzZz sees this) <input name="contact" maxlength="200" placeholder="Email or handle, optional"></label>
-      <label><input type="checkbox" name="agree_rules" required style="width:auto"> I agree to the board rules above</label>
+      <label><input type="checkbox" name="agree_rules" required style="width:auto"> I agree to the board rules</label>
       <button class="primary" type="submit">Request to join</button>
       <p class="meta" id="apply-msg"></p>
     </form>

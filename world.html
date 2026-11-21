@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lotscenedepot</title>
+<style>
+  html,body { margin:0; width:100%; height:100%; overflow:hidden; background:#080619; color:white;
+    font:16px system-ui,sans-serif }
+  canvas { display:block }
+  #welcome,#message { position:fixed; z-index:2; left:50%; transform:translateX(-50%);
+    background:#100d24dd; border:1px solid #b794ff; border-radius:14px; text-align:center;
+    padding:16px 22px; box-shadow:0 0 24px #8d53ff55 }
+  #welcome { top:35%; cursor:pointer; max-width:440px }
+  #message { bottom:7%; display:none; pointer-events:none }
+  #hint { position:fixed; top:14px; left:16px; z-index:1; text-shadow:0 2px 5px #000 }
+  #crosshair { position:fixed; top:50%; left:50%; transform:translate(-50%,-50%);
+    z-index:1; color:#fff; font-size:22px; text-shadow:0 0 8px #8ef }
+</style>
+</head>
+<body>
+<div id="hint">LOTSCENEDEPOT · WASD move · Mouse look · Shift run · E interact · Esc unlock</div>
+<div id="crosshair">+</div>
+<div id="welcome"><h2>Welcome to Lotscenedepot</h2><p>A festival on a far-out asteroid.</p>
+  <p>Click to enter · WASD to explore · E to visit vendors</p></div>
+<div id="message"></div>
+
+<script type="module">
+import * as THREE from 'https://cdn.jsdelivr.net/npm/three@0.160.0/build/three.module.js';
+import { PointerLockControls } from 'https://cdn.jsdelivr.net/npm/three@0.160.0/examples/jsm/controls/PointerLockControls.js';
+
+const scene = new THREE.Scene();
+scene.background = new THREE.Color(0x090719);
+scene.fog = new THREE.FogExp2(0x090719, 0.0032);
+
+const camera = new THREE.PerspectiveCamera(72, innerWidth / innerHeight, 0.1, 500);
+camera.position.set(0, 2, 23);
+
+const renderer = new THREE.WebGLRenderer({ antialias:true });
+renderer.setSize(innerWidth, innerHeight);
+renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
+renderer.shadowMap.enabled = true;
+renderer.shadowMap.type = THREE.PCFSoftShadowMap;
+document.body.appendChild(renderer.domElement);
+
+const controls = new PointerLockControls(camera, renderer.domElement);
+const welcome = document.querySelector('#welcome');
+const message = document.querySelector('#message');
+welcome.onclick = () => controls.lock();
+controls.addEventListener('lock', () => welcome.style.display = 'none');
+controls.addEventListener('unlock', () => welcome.style.display = 'block');
+
+scene.add(new THREE.HemisphereLight(0xb9c4ff, 0x24102c, 2));
+const sun = new THREE.PointLight(0xffad66, 180, 120);
+sun.position.set(-18, 30, 12); scene.add(sun);
+const orbLight = new THREE.PointLight(0x7b4dff, 100, 90);
+orbLight.position.set(18, 15, -30); scene.add(orbLight);
+
+const asteroid = new THREE.Mesh(
+  new THREE.SphereGeometry(66, 72, 48),
+  new THREE.MeshStandardMaterial({ color:0x28243a, roughness:0.92 })
+);
+asteroid.scale.y = 0.23;
+asteroid.position.y = -15;
+asteroid.receiveShadow = true;
+scene.add(asteroid);
+
+// Dusty festival ground and glowing circular paths.
+const ground = new THREE.Mesh(
+  new THREE.CircleGeometry(60, 96),
+  new THREE.MeshStandardMaterial({ color:0x30283d, roughness:1, side:THREE.DoubleSide })
+);
+ground.rotation.x = -Math.PI / 2;
+ground.position.y = 0.18;
+ground.receiveShadow = true;
+scene.add(ground);
+
+for (let r of [8, 18, 31, 46]) {
+  const ring = new THREE.Mesh(new THREE.TorusGeometry(r, 0.08, 8, 180),
+    new THREE.MeshBasicMaterial({ color:r === 18 ? 0x31e9ff : 0x9553ff }));
+  ring.rotation.x = Math.PI / 2;
+  ring.position.y = 0.28;
+  scene.add(ring);
+}
+
+// Star field.
+const starPositions = [];
+for (let i=0; i<1800; i++) {
+  const v = new THREE.Vector3(
+    (Math.random()-.5)*340, Math.random()*130+8, (Math.random()-.5)*340
+  );
+  starPositions.push(v.x,v.y,v.z);
+}
+const starGeo = new THREE.BufferGeometry();
+starGeo.setAttribute('position', new THREE.Float32BufferAttribute(starPositions,3));
+scene.add(new THREE.Points(starGeo,
+  new THREE.PointsMaterial({ color:0xd9d0ff, size:0.42, sizeAttenuation:true })));
+
+function label(text, color='#fff') {
+  const c=document.createElement('canvas'), ctx=c.getContext('2d');
+  c.width=512; c.height=128;
+  ctx.fillStyle='rgba(12,8,30,.86)'; ctx.fillRect(0,0,512,128);
+  ctx.strokeStyle='#b879ff'; ctx.lineWidth=5; ctx.strokeRect(4,4,504,120);
+  ctx.fillStyle=color; ctx.font='bold 42px system-ui'; ctx.textAlign='center';
+  ctx.textBaseline='middle'; ctx.fillText(text,256,64);
+  const tex=new THREE.CanvasTexture(c);
+  return new THREE.Mesh(new THREE.PlaneGeometry(5.2,1.3),
+    new THREE.MeshBasicMaterial({map:tex,transparent:true,side:THREE.DoubleSide}));
+}
+
+const vendors = [];
+const vendorNames = ['Cosmic Threads','Nebula Snacks','Crystal Exchange','Alien Artifacts',
+  'Starlight Supplies','Moon Market','Dreamwave Records','Asteroid Apothecary'];
+const colors = [0xff4fb8,0x35d6d0,0xffbd4a,0x9d6bff,0x59e36d,0xff637d,0x39a9ff,0xd68aff];
+
+for (let i=0; i<vendorNames.length; i++) {
+  const a=i/8*Math.PI*2, radius=27;
+  const group=new THREE.Group();
+  group.position.set(Math.cos(a)*radius,0.2,Math.sin(a)*radius);
+  group.rotation.y=-a+Math.PI/2;
+  scene.add(group);
+
+  const mat=new THREE.MeshStandardMaterial({color:colors[i],roughness:0.75});
+  const table=new THREE.Mesh(new THREE.BoxGeometry(5,1.1,2.2),mat);
+  table.position.y=0.85; table.castShadow=true; group.add(table);
+
+  const roof=new THREE.Mesh(new THREE.BoxGeometry(5.8,.3,3),
+    new THREE.MeshStandardMaterial({color:colors[i],emissive:colors[i],emissiveIntensity:.22}));
+  roof.position.y=3.2; roof.castShadow=true; group.add(roof);
+
+  for (const x of [-2.55,2.55]) {
+    const pole=new THREE.Mesh(new THREE.CylinderGeometry(.09,.09,2.4,8),
+      new THREE.MeshStandardMaterial({color:0xd6c9ff,metalness:.4}));
+    pole.position.set(x,2,0); group.add(pole);
+  }
+
+  const sign=label(vendorNames[i]);
+  sign.position.set(0,4.25,0); group.add(sign);
+
+  const light=new THREE.PointLight(colors[i],22,12);
+  light.position.set(0,3,0); group.add(light);
+  vendors.push({group,name:vendorNames[i],color:colors[i]});
+}
+
+// Festival dome and DJ platform.
+const stage = new THREE.Group();
+stage.position.set(0,0,-39);
+scene.add(stage);
+const platform=new THREE.Mesh(new THREE.CylinderGeometry(12,13,1.2,12),
+  new THREE.MeshStandardMaterial({color:0x211a38,metalness:.45,roughness:.45}));
+platform.position.y=.8; platform.receiveShadow=true; stage.add(platform);
+
+const dome=new THREE.Mesh(new THREE.SphereGeometry(12,24,16,0,Math.PI*2,0,Math.PI/2),
+  new THREE.MeshBasicMaterial({color:0x8d55ff,wireframe:true,transparent:true,opacity:.65}));
+dome.position.y=1.2; stage.add(dome);
+
+const dj=new THREE.Mesh(new THREE.BoxGeometry(7,2,1.2),
+  new THREE.MeshStandardMaterial({color:0x161126,emissive:0x5628a8,emissiveIntensity:.8}));
+dj.position.set(0,2,-8); stage.add(dj);
+
+const stageSign=label('LOTSCENEDEPOT · MAIN STAGE','#ffe9a6');
+stageSign.scale.set(1.7,1.7,1.7);
+stageSign.position.set(0,8,-11.7); stage.add(stageSign);
+
+const stageLight=new THREE.PointLight(0xb75cff,170,45);
+stageLight.position.set(0,12,-39); scene.add(stageLight);
+
+// Distant glowing geometric "asteroid sun".
+const sphere=new THREE.Mesh(new THREE.IcosahedronGeometry(9,2),
+  new THREE.MeshBasicMaterial({color:0xffc45c,wireframe:true}));
+sphere.position.set(-28,27,-53); scene.add(sphere);
+const core=new THREE.Mesh(new THREE.SphereGeometry(5.5,32,24),
+  new THREE.MeshBasicMaterial({color:0xffb447}));
+core.position.copy(sphere.position); scene.add(core);
+
+const keys={};
+addEventListener('keydown',e=>{
+  keys[e.code]=true;
+  if(e.code==='KeyE') interact();
+});
+addEventListener('keyup',e=>keys[e.code]=false);
+
+const clock=new THREE.Clock();
+let nearest=null, messageTimer=0;
+function interact() {
+  if(nearest) {
+    message.textContent=`Welcome to ${nearest.name}! Vendor stall coming soon.`;
+    message.style.display='block'; messageTimer=3.2;
+  } else {
+    message.textContent='Walk closer to a glowing vendor stall to visit.';
+    message.style.display='block'; messageTimer=2.2;
+  }
+}
+function animate() {
+  requestAnimationFrame(animate);
+  const dt=Math.min(clock.getDelta(),.05);
+  if(controls.isLocked) {
+    const speed=(keys.ShiftLeft||keys.ShiftRight)?18:10;
+    if(keys.KeyW||keys.ArrowUp) controls.moveForward(speed*dt);
+    if(keys.KeyS||keys.ArrowDown) controls.moveForward(-speed*dt);
+    if(keys.KeyA||keys.ArrowLeft) controls.moveRight(-speed*dt);
+    if(keys.KeyD||keys.ArrowRight) controls.moveRight(speed*dt);
+
+    const p=controls.getObject().position;
+    const max=57, d=Math.hypot(p.x,p.z);
+    if(d>max){p.x*=max/d;p.z*=max/d;}
+    p.y=2;
+
+    nearest=null; let best=7;
+    for(const v of vendors) {
+      const dist=p.distanceTo(v.group.position);
+      if(dist<best){best=dist;nearest=v;}
+    }
+  }
+  if(messageTimer>0 && (messageTimer-=dt)<=0) message.style.display='none';
+  sphere.rotation.y+=dt*.07;
+  renderer.render(scene,camera);
+}
+animate();
+
+addEventListener('resize',()=>{
+  camera.aspect=innerWidth/innerHeight;
+  camera.updateProjectionMatrix();
+  renderer.setSize(innerWidth,innerHeight);
+});
+</script>
+</body>
+</html>
